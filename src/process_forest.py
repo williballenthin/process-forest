@@ -307,8 +307,11 @@ class Node(object):
 
 
 def format_node(analyzer, node):
-    # TODO: definitely show notes
-    return str(node.get_process(analyzer))
+    p = node.get_process(analyzer)
+    s = str(p)
+    if p.notes is not None and len(p.notes) > 0:
+        s += ": " + p.notes
+    return s
 
 
 def draw_tree(analyzer, node, indent=0):
