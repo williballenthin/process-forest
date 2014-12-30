@@ -363,7 +363,7 @@ def main():
         description="Print the record numbers of EVTX log entries "
                     "that match the given EID.")
     parser.add_argument("input_file", type=str,
-                        help="Path to the Windows EVTX file or .pf file")
+                        help="Path to the Windows EVTX file or .pt file")
 
     subparsers = parser.add_subparsers(dest="cmd")
 
@@ -374,13 +374,13 @@ def main():
     summary_parser = subparsers.add_parser("summary")
 
     serialize_parser = subparsers.add_parser("serialize")
-    serialize_parser.add_argument("pf", type=str, default="state.pf",
-                        help=".pf file to serialize parsed trees")
+    serialize_parser.add_argument("pt", type=str, default="state.pt",
+                        help=".pt file to serialize parsed trees")
 
     args = parser.parse_args()
 
     analyzer = ProcessTreeAnalyzer()
-    if args.input_file.lower().endswith(".pf"):
+    if args.input_file.lower().endswith(".pt"):
         g_logger.info("using serialized file")
         with open(args.input_file, "rb") as f:
             analyzer.deserialize(f)
@@ -399,10 +399,10 @@ def main():
         else:
             g_logger.error("query trees not yet supported")
     elif args.cmd == "serialize":
-        if not args.pf.lower().endswith(".pf"):
-            g_logger.error("serialize output file must have .pf extension")
+        if not args.pt.lower().endswith(".pt"):
+            g_logger.error("serialize output file must have .pt extension")
         else:
-            with open(args.pf, "wb") as f:
+            with open(args.pt, "wb") as f:
                 analyzer.serialize(f)
     else:
         g_logger.error("unknown command: %s", args.cmd)
