@@ -47,6 +47,8 @@ class Process(object):
                 self.path, self.pid, self.ppid,
                 self.begin.isoformat(), self.end.isoformat())
 
+    # TODO: move serialize, deserialize here
+
 
 def create_fake_parent_process(pid):
     p = Process(pid, 0, "UNKNOWN", "UNKNOWN", "UNKNOWN", "UNKNOWN", "UNKNOWN")
@@ -201,17 +203,16 @@ class ProcessTreeAnalyzer(object):
         for process in self._defs.values():
             if process.parent is not None:
                 process.parent = process.parent.id
-            #print(process.children)
             process.children = [c.id for c in process.children]
-            # TODO: why is c.id None here?
-            #print(process.children)
 
     def get_roots(self):
         """
         @rtype: list of Node
         """
         ret = []
+        # TODO: move this outside analyzer
         def get_children_nodes(analyzer, node):
+            # TODO: still need this hacky check?
             if isinstance(node, int):
                 n = Node(node, None, [])
                 p = n.get_process(analyzer)
@@ -306,6 +307,7 @@ class Node(object):
 
 
 def format_node(analyzer, node):
+    # TODO: definitely show notes
     return str(node.get_process(analyzer))
 
 
@@ -395,7 +397,7 @@ def main():
             for root in analyzer.get_roots():
                 draw_tree(analyzer, root)
         else:
-            draw_trees_at_timestamp(analyzer.get_roots(), iso8601.parse_date(args.ts).replace(tzinfo=None))
+            g_logger.error("query trees not yet supported")
     elif args.cmd == "serialize":
         if not args.pf.lower().endswith(".pf"):
             g_logger.error("serialize output file must have .pf extension")
