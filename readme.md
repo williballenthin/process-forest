@@ -1,7 +1,7 @@
 purpose
 =======
 
-`process-trees` is a tool that processes Microsoft Windows
+`process-forest` is a tool that processes Microsoft Windows
 EVTX event logs that contain process accounting events and
 reconstructs the historical process heirarchies. That is,
 it displays the parent-child relationships among programs.
@@ -14,8 +14,8 @@ it may be maintaining persistence.
 technique
 =========
 
-This tool relies on the process accounting events that may
-be enabled and captured in the Security event log. When a
+`process-forest` relies on the process accounting events that 
+may be enabled and captured in the Security event log. When a
 new process is spawned, the event logs capture event 4688
 that includes the process path, username information, PID
 and parent PID, etc. The 4689 event signals a process has
