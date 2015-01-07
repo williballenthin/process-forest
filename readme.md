@@ -52,14 +52,14 @@ Display process trees for all process lifetime events:
       Process(C:\Windows\System32\cmd.exe, pid=2510, ppid=1b2c, begin=2014-12-15T02:01:17.479113+00:00, end=2014-12-15T02:03:04.685062+00:00
         Process(C:\Windows\System32\HOSTNAME.EXE, pid=13a8, ppid=2510, begin=2014-12-15T02:01:33.375921+00:00, end=2014-12-15T02:01:33.453922+00:00
         Process(C:\Windows\System32\sc.exe, pid=694, ppid=2510, begin=2014-12-15T02:01:40.037292+00:00, end=2014-12-15T02:01:40.068493+00:00
-        Process(C:\Windows\IME\conhost.exe, pid=1cb8, ppid=2510, begin=2014-12-15T02:02:43.546520+00:00, end=2014-12-15T02:02:43.671322+00:00
+        Process(C:\Windows\Temp\conhost.exe, pid=1cb8, ppid=2510, begin=2014-12-15T02:02:43.546520+00:00, end=2014-12-15T02:02:43.671322+00:00
           Process(C:\Windows\System32\cmd.exe, pid=23ac, ppid=1cb8, begin=2014-12-15T02:02:43.671322+00:00, end=2014-12-15T02:02:47.758629+00:00
             Process(C:\Windows\System32\PING.EXE, pid=18d4, ppid=23ac, begin=2014-12-15T02:02:43.686924+00:00, end=2014-12-15T02:02:47.758629+00:00
             Process(C:\Windows\System32\cmd.exe, pid=2928, ppid=23ac, begin=2014-12-15T02:02:47.758629+00:00, end=2014-12-15T02:02:47.758629+00:00
         Process(C:\Windows\System32\sc.exe, pid=1990, ppid=2510, begin=2014-12-15T02:02:50.441896+00:00, end=2014-12-15T02:02:50.457497+00:00
         Process(C:\Windows\System32\sc.exe, pid=28bc, ppid=2510, begin=2014-12-15T02:02:57.368475+00:00, end=2014-12-15T02:02:57.368475+00:00
       Process(C:\Windows\System32\cmd.exe, pid=2c2c, ppid=1b2c, begin=2014-12-15T02:13:39.496538+00:00, end=2014-12-15T02:14:11.258953+00:00
-        Process(C:\Windows\IME\flashupdate.exe, pid=d2c, ppid=2c2c, begin=2014-12-15T02:14:02.647532+00:00, end=2014-11-27T07:46:00.072481+00:00
+        Process(C:\Windows\Temp\flashupdate.exe, pid=d2c, ppid=2c2c, begin=2014-12-15T02:14:02.647532+00:00, end=2014-11-27T07:46:00.072481+00:00
           Process(C:\Windows\System32\cmd.exe, pid=d14, ppid=d2c, begin=2014-12-15T02:18:21.473768+00:00, end=2014-11-28T17:31:04.396505+00:00
       Process(C:\Windows\System32\cmd.exe, pid=b74, ppid=1b2c, begin=2014-12-15T02:18:00.538031+00:00, end=2014-12-15T02:23:11.251200+00:00
         Process(C:\Windows\System32\HOSTNAME.EXE, pid=1414, ppid=b74, begin=2014-12-15T02:19:15.607157+00:00, end=2014-12-15T02:19:15.622757+00:00
