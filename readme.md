@@ -18,7 +18,7 @@ technique
 may be enabled and captured in the Security event log. When a
 new process is spawned, the event logs capture event 4688
 that includes the process path, username information, PID
-and parent PID, etc. The 4689 event signals a process has
+and parent PID, etc. Events with EID 4689 signal that a process has
 exited. By walking these events in order, keeping track
 of PID "liveness", and watching PID/PPID links, this tool
 reconstructs the relationships among all processes captured
@@ -86,7 +86,7 @@ Display process trees for all process lifetime events:
         ...
 
 
-For large EVTX files, the Python parsing implementation takes a while.
+For large EVTX files, the parsing can take a while (due to the implementation in Python).
 To save time as you explore the tool, you can preprocess the log file into
 a ".pt" (Process Tree) file, which speeds up subsequent invokations.
 Use the .pt file instead of the EVTX file, and the tool will handle
@@ -118,7 +118,7 @@ Now when we run the listings again, it goes much faster:
 limitations
 ===========
 
-  - this tool currently only supports SECURITY.EVTX files. EVT support is coming later.
+  - this tool currently only supports Security.EVTX files. EVT support is coming later.
   - this tool only captures information from the event log. If important entries
     are missing, then it can only do a best-effort job to reconstruct the process
     trees. For example:
