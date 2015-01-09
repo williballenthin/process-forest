@@ -321,10 +321,16 @@ def draw_tree(analyzer, node, indent=0):
 
 
 def summarize_processes(processes):
-    first_process = min(filter(lambda p:p.begin != datetime.datetime.min, processes), key=lambda p:p.begin)
-    last_process = max(filter(lambda p:p.begin != datetime.datetime.min, processes), key=lambda p:p.begin)
-    print("first event: %s" % (first_process.begin.isoformat()))
-    print("last event: %s" % (last_process.begin.isoformat()))
+    try:
+        first_process = min(filter(lambda p:p.begin != datetime.datetime.min, processes), key=lambda p:p.begin)
+        print("first event: %s" % (first_process.begin.isoformat()))
+    except ValueError:
+        print("first event: unknown")
+    try:
+        last_process = max(filter(lambda p:p.begin != datetime.datetime.min, processes), key=lambda p:p.begin)
+        print("last event: %s" % (last_process.begin.isoformat()))
+    except ValueError:
+        print("last event: unknown")
     print("-------------------------")
 
     counts = {}  # map from path to count
