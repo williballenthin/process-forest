@@ -2,4 +2,5 @@ python-evtx
 lxml
 iso8601
 argparse
+pytz
 
