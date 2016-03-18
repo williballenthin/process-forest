@@ -93,7 +93,7 @@ class Entry(object):
         pid = int(self.get_xpath("/Event/EventData/Data[@Name='NewProcessId']").text, 0x10)
         ppid = int(self.get_xpath("/Event/EventData/Data[@Name='ProcessId']").text, 0x10)
         try:
-            cmdline = self.get_xpath("/Event/EventData/Data[@Name='CommandLine']
+            cmdline = self.get_xpath("/Event/EventData/Data[@Name='CommandLine']").text
         except:
             cmdline = ""
         user = self.get_xpath("/Event/EventData/Data[@Name='SubjectUserName']").text
