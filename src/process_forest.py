@@ -44,12 +44,8 @@ class Process(object):
         self.id = None  # set by analyzer, unique with analyzer session
 
     def __str__(self):
-        if self.cmdline == "":
-            cmdl = ""
-        else:
-            cmdl = " " + "\"" + self.cmdline + "\""
-        return "Process(%s%s, pid=%x, ppid=%x, begin=%s, end=%s" % (
-                self.path, cmdl, self.pid, self.ppid,
+        return "Process(%s, cmd=%s, pid=%x, ppid=%x, begin=%s, end=%s" % (
+                self.path, self.cmdline, self.pid, self.ppid,
                 self.begin.isoformat(), self.end.isoformat())
 
     # TODO: move serialize, deserialize here
