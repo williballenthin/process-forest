@@ -28,12 +28,13 @@ def to_lxml(record_xml):
 class Process(object):
     NOTE_FAKE_PARENT = "Fake Parent: This is a faked process created since a ppid didn't exist"
     NOTE_END_LOST = "Lost End Timestamp: This end timestamp is suspect, because it collided with another process"
-    def __init__(self, pid, ppid, cmdline, path, user, domain, logonid, computer):
+    def __init__(self, pid, ppid, cmdline, ppname, path, user, domain, logonid, computer):
         super(Process, self).__init__()
         self.pid = pid
         self.ppid = ppid
         self.path = path
         self.cmdline = cmdline
+        self.ppname = ppname
         self.user = user
         self.domain = domain
         self.logonid = logonid
@@ -53,8 +54,8 @@ class Process(object):
     # TODO: move serialize, deserialize here
 
 
-def create_fake_parent_process(pid):
-    p = Process(pid, 0, "", "UNKNOWN", "UNKNOWN", "UNKNOWN", "UNKNOWN", "UNKNOWN")
+def create_fake_parent_process(pid, name):
+    p = Process(pid, 0, "UNKNOWN", "UNKNOWN", name, "UNKNOWN", "UNKNOWN", "UNKNOWN", "UNKNOWN")
     p.notes = Process.NOTE_FAKE_PARENT
     return p
 
@@ -93,12 +94,16 @@ class Entry(object):
         try:
             cmdline = self.get_xpath("/Event/EventData/Data[@Name='CommandLine']").text
         except:
-            cmdline = ""
+            cmdline = "UNKNOWN"
+        try:
+            ppname = self.get_xpath("/Event/EventData/Data[@Name='ParentProcessName']").text
+        except:
+            ppname = "UNKNOWN"
         user = self.get_xpath("/Event/EventData/Data[@Name='SubjectUserName']").text
         domain = self.get_xpath("/Event/EventData/Data[@Name='SubjectDomainName']").text
         logonid = self.get_xpath("/Event/EventData/Data[@Name='SubjectLogonId']").text
         computer = self.get_xpath("/Event/System/Computer").text
-        p = Process(pid, ppid, cmdline, path, user, domain, logonid, computer)
+        p = Process(pid, ppid, cmdline, ppname, path, user, domain, logonid, computer)
         p.begin = self._record.timestamp()
         return p
 
@@ -106,12 +111,13 @@ class Entry(object):
         path = self.get_xpath("/Event/EventData/Data[@Name='ProcessName']").text
         pid = int(self.get_xpath("/Event/EventData/Data[@Name='ProcessId']").text, 0x10)
         ppid = int(self.get_xpath("/Event/System/Execution").get("ProcessID"), 10)
-        cmdline = ""
+        cmdline = "UNKNOWN"
+        ppname = "UNKNOWN"
         user = self.get_xpath("/Event/EventData/Data[@Name='SubjectUserName']").text
         domain = self.get_xpath("/Event/EventData/Data[@Name='SubjectDomainName']").text
         logonid = self.get_xpath("/Event/EventData/Data[@Name='SubjectLogonId']").text
         computer = self.get_xpath("/Event/System/Computer").text
-        p = Process(pid, ppid, cmdline, path, user, domain, logonid, computer)
+        p = Process(pid, ppid, cmdline, ppname, path, user, domain, logonid, computer)
         p.end = self._record.timestamp()
         return p
 
@@ -175,7 +181,8 @@ class ProcessTreeAnalyzer(object):
                 else:
                     self._logger.warning("parent process %x not captured for new process %x", process.ppid, process.pid)
                     # open a faked parent
-                    process.parent = create_fake_parent_process(process.ppid)
+                    process.parent = create_fake_parent_process(process.ppid, process.ppname)
+                    process.parent.children.append(process)
                     open_processes[process.ppid] = process.parent
 
             elif entry.is_process_exited_event():
@@ -252,6 +259,8 @@ class ProcessTreeAnalyzer(object):
                 "id": process.id,
                 "pid": process.pid,
                 "ppid": process.ppid,
+                "cmdline": process.cmdline,
+                "ppname": process.ppname,
                 "path": process.path,
                 "user": process.user,
                 "domain": process.domain,
@@ -276,7 +285,7 @@ class ProcessTreeAnalyzer(object):
         data = json.loads(s)
 
         def complexify_process(p):
-            process = Process(p["pid"], p["ppid"], p["path"], p["user"], p["domain"], p["logonid"], p["computer"])
+            process = Process(p["pid"], p["ppid"], p["cmdline"], p["ppname"], p["path"], p["user"], p["domain"], p["logonid"], p["computer"])
             process.begin = iso8601.parse_date(p["begin"]).replace(tzinfo=None)
             process.end = iso8601.parse_date(p["end"]).replace(tzinfo=None)
             process.parent = p["parent"]
