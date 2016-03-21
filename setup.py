@@ -10,7 +10,8 @@ setup(
     install_requires=[
         'iso8601',
         'lxml',
-        'python-evtx'
+        'python-evtx',
+        'pytz'
     ],
     scripts=[
         'src/process_forest.py',
