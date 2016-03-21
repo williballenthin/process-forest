@@ -110,7 +110,7 @@ class Entry(object):
         pid = int(self.get_xpath("/Event/EventData/Data[@Name='ProcessId']").text, 0x10)
         ppid = int(self.get_xpath("/Event/System/Execution").get("ProcessID"), 10)
         cmdline = "UNKNOWN"
-        ppname = ""
+        ppname = "UNKNOWN"
         user = self.get_xpath("/Event/EventData/Data[@Name='SubjectUserName']").text
         domain = self.get_xpath("/Event/EventData/Data[@Name='SubjectDomainName']").text
         logonid = self.get_xpath("/Event/EventData/Data[@Name='SubjectLogonId']").text
