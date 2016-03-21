@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import logging
 import datetime
 from collections import namedtuple
