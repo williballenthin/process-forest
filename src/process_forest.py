@@ -92,7 +92,7 @@ class Entry(object):
         try:
             cmdline = self.get_xpath("/Event/EventData/Data[@Name='CommandLine']").text
         except:
-            cmdline = ""
+            cmdline = "UNKNOWN"
         try:
             ppname = self.get_xpath("/Event/EventData/Data[@Name='ParentProcessName']").text
         except:
@@ -109,7 +109,7 @@ class Entry(object):
         path = self.get_xpath("/Event/EventData/Data[@Name='ProcessName']").text
         pid = int(self.get_xpath("/Event/EventData/Data[@Name='ProcessId']").text, 0x10)
         ppid = int(self.get_xpath("/Event/System/Execution").get("ProcessID"), 10)
-        cmdline = ""
+        cmdline = "UNKNOWN"
         ppname = ""
         user = self.get_xpath("/Event/EventData/Data[@Name='SubjectUserName']").text
         domain = self.get_xpath("/Event/EventData/Data[@Name='SubjectDomainName']").text
