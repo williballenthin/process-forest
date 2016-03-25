@@ -149,7 +149,7 @@ class Entry(object):
     def get_process_from_5_event(self):
         path = self.get_xpath("/Event/EventData/Data[@Name='Image']").text
         pid = int(self.get_xpath("/Event/EventData/Data[@Name='ProcessId']").text, 0x10)
-        ppid = "UNKNOWN"
+        ppid = 0
         cmdline = "UNKNOWN"
         ppname = "UNKNOWN"
         hashes = "UNKNOWN"
