@@ -28,13 +28,14 @@ def to_lxml(record_xml):
 class Process(object):
     NOTE_FAKE_PARENT = "Fake Parent: This is a faked process created since a ppid didn't exist"
     NOTE_END_LOST = "Lost End Timestamp: This end timestamp is suspect, because it collided with another process"
-    def __init__(self, pid, ppid, cmdline, ppname, path, user, domain, logonid, computer):
+    def __init__(self, pid, ppid, cmdline, ppname, hashes, path, user, domain, logonid, computer):
         super(Process, self).__init__()
         self.pid = pid
         self.ppid = ppid
         self.path = path
         self.cmdline = cmdline
         self.ppname = ppname
+        self.hashes = hashes
         self.user = user
         self.domain = domain
         self.logonid = logonid
@@ -47,15 +48,15 @@ class Process(object):
         self.id = None  # set by analyzer, unique with analyzer session
 
     def __str__(self):
-        return "Process(%s, cmd=%s, pid=%x, ppid=%x, begin=%s, end=%s" % (
-                self.path, self.cmdline, self.pid, self.ppid,
+        return "Process(%s, cmd=%s, hashes=%s, pid=%x, ppid=%x, begin=%s, end=%s" % (
+                self.path, self.cmdline, self.hashes, self.pid, self.ppid,
                 self.begin.isoformat(), self.end.isoformat())
 
     # TODO: move serialize, deserialize here
 
 
 def create_fake_parent_process(pid, name):
-    p = Process(pid, 0, "UNKNOWN", "UNKNOWN", name, "UNKNOWN", "UNKNOWN", "UNKNOWN", "UNKNOWN")
+    p = Process(pid, 0, "UNKNOWN", "UNKNOWN", "UNKNOWN", name, "UNKNOWN", "UNKNOWN", "UNKNOWN", "UNKNOWN")
     p.notes = Process.NOTE_FAKE_PARENT
     return p
 
@@ -87,6 +88,12 @@ class Entry(object):
     def is_process_exited_event(self):
         return self.get_eid() == 4689
 
+    def is_sysmon_proc_created_event(self):
+        return self.get_eid() == 1
+
+    def is_sysmon_proc_exited_event(self):
+        return self.get_eid() == 5
+
     def get_process_from_4688_event(self):
         path = self.get_xpath("/Event/EventData/Data[@Name='NewProcessName']").text
         pid = int(self.get_xpath("/Event/EventData/Data[@Name='NewProcessId']").text, 0x10)
@@ -99,11 +106,12 @@ class Entry(object):
             ppname = self.get_xpath("/Event/EventData/Data[@Name='ParentProcessName']").text
         except:
             ppname = "UNKNOWN"
+        hashes = "UNKNOWN"
         user = self.get_xpath("/Event/EventData/Data[@Name='SubjectUserName']").text
         domain = self.get_xpath("/Event/EventData/Data[@Name='SubjectDomainName']").text
         logonid = self.get_xpath("/Event/EventData/Data[@Name='SubjectLogonId']").text
         computer = self.get_xpath("/Event/System/Computer").text
-        p = Process(pid, ppid, cmdline, ppname, path, user, domain, logonid, computer)
+        p = Process(pid, ppid, cmdline, ppname, hashes, path, user, domain, logonid, computer)
         p.begin = self._record.timestamp()
         return p
 
@@ -113,11 +121,43 @@ class Entry(object):
         ppid = int(self.get_xpath("/Event/System/Execution").get("ProcessID"), 10)
         cmdline = "UNKNOWN"
         ppname = "UNKNOWN"
+        hashes = "UNKNOWN"
         user = self.get_xpath("/Event/EventData/Data[@Name='SubjectUserName']").text
         domain = self.get_xpath("/Event/EventData/Data[@Name='SubjectDomainName']").text
         logonid = self.get_xpath("/Event/EventData/Data[@Name='SubjectLogonId']").text
         computer = self.get_xpath("/Event/System/Computer").text
-        p = Process(pid, ppid, cmdline, ppname, path, user, domain, logonid, computer)
+        p = Process(pid, ppid, cmdline, ppname, hashes, path, user, domain, logonid, computer)
+        p.end = self._record.timestamp()
+        return p
+        
+    def get_process_from_1_event(self):
+        path = self.get_xpath("/Event/EventData/Data[@Name='Image']").text
+        pid = int(self.get_xpath("/Event/EventData/Data[@Name='ProcessId']").text, 0x10)
+        ppid = int(self.get_xpath("/Event/EventData/Data[@Name='ParentProcessId']").text, 0x10)
+        cmdline = self.get_xpath("/Event/EventData/Data[@Name='CommandLine']").text
+        ppname = self.get_xpath("/Event/EventData/Data[@Name='ParentImage']").text
+        hashes = self.get_xpath("/Event/EventData/Data[@Name='Hashes']").text
+        ud = self.get_xpath("/Event/EventData/Data[@Name='User']").text.split("\\")
+        user = ud[1]
+        domain = ud[0]
+        logonid = self.get_xpath("/Event/EventData/Data[@Name='LogonId']").text
+        computer = self.get_xpath("/Event/System/Computer").text
+        p = Process(pid, ppid, cmdline, ppname, hashes, path, user, domain, logonid, computer)
+        p.begin = self._record.timestamp()
+        return p
+    
+    def get_process_from_5_event(self):
+        path = self.get_xpath("/Event/EventData/Data[@Name='Image']").text
+        pid = int(self.get_xpath("/Event/EventData/Data[@Name='ProcessId']").text, 0x10)
+        ppid = 0
+        cmdline = "UNKNOWN"
+        ppname = "UNKNOWN"
+        hashes = "UNKNOWN"
+        user = "UNKNOWN"
+        domain = "UNKNOWN"
+        logonid = "UNKNOWN"
+        computer = self.get_xpath("/Event/System/Computer").text
+        p = Process(pid, ppid, cmdline, ppname, hashes, path, user, domain, logonid, computer)
         p.end = self._record.timestamp()
         return p
 
@@ -126,6 +166,10 @@ class Entry(object):
             return self.get_process_from_4688_event()
         elif self.is_process_exited_event():
             return self.get_process_from_4689_event()
+        elif self.is_sysmon_proc_created_event():
+            return self.get_process_from_1_event()
+        elif self.is_sysmon_proc_exited_event():
+            return self.get_process_from_5_event()
         else:
             raise NotAProcessEventError()
 
@@ -165,7 +209,7 @@ class ProcessTreeAnalyzer(object):
         open_processes = {}
         closed_processes = []
         for entry in entries:
-            if entry.is_process_created_event():
+            if entry.is_process_created_event() or entry.is_sysmon_proc_created_event():
                 process = entry.get_process_from_event()
                 if process.pid in open_processes:
                     self._logger.warning("collision on pid: %x", process.pid)
@@ -185,7 +229,7 @@ class ProcessTreeAnalyzer(object):
                     process.parent.children.append(process)
                     open_processes[process.ppid] = process.parent
 
-            elif entry.is_process_exited_event():
+            elif entry.is_process_exited_event() or entry.is_sysmon_proc_exited_event():
                 process = entry.get_process_from_event()
                 if process.pid in open_processes:
                     # use existing process instance, if it exists
@@ -261,6 +305,7 @@ class ProcessTreeAnalyzer(object):
                 "ppid": process.ppid,
                 "cmdline": process.cmdline,
                 "ppname": process.ppname,
+                "hashes": process.hashes,
                 "path": process.path,
                 "user": process.user,
                 "domain": process.domain,
@@ -285,7 +330,7 @@ class ProcessTreeAnalyzer(object):
         data = json.loads(s)
 
         def complexify_process(p):
-            process = Process(p["pid"], p["ppid"], p["cmdline"], p["ppname"], p["path"], p["user"], p["domain"], p["logonid"], p["computer"])
+            process = Process(p["pid"], p["ppid"], p["cmdline"], p["ppname"], p["hashes"], p["path"], p["user"], p["domain"], p["logonid"], p["computer"])
             process.begin = iso8601.parse_date(p["begin"]).replace(tzinfo=None)
             process.end = iso8601.parse_date(p["end"]).replace(tzinfo=None)
             process.parent = p["parent"]
@@ -413,7 +458,7 @@ def main():
     else:
         g_logger.info("using evtx log file")
         with Evtx(args.input_file) as evtx:
-            analyzer.analyze(get_entries_with_eids(evtx, set([4688, 4689])))
+            analyzer.analyze(get_entries_with_eids(evtx, set([4688, 4689, 1, 5])))
             pass
 
     if args.cmd == "summary":
