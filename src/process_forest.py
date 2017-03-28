@@ -21,8 +21,9 @@ def to_lxml(record_xml):
     """
     @type record: Record
     """
+    utf8_parser = etree.XMLParser(encoding='utf-8')
     return etree.fromstring("<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\" ?>%s" %
-            record_xml.replace("xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"", ""))
+            record_xml.replace("xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"", "").encode('utf-8'), parser=utf8_parser)
 
 
 class Process(object):
@@ -129,7 +130,7 @@ class Entry(object):
         p = Process(pid, ppid, cmdline, ppname, hashes, path, user, domain, logonid, computer)
         p.end = self._record.timestamp()
         return p
-        
+
     def get_process_from_1_event(self):
         path = self.get_xpath("/Event/EventData/Data[@Name='Image']").text
         pid = int(self.get_xpath("/Event/EventData/Data[@Name='ProcessId']").text, 0x10)
@@ -145,7 +146,7 @@ class Entry(object):
         p = Process(pid, ppid, cmdline, ppname, hashes, path, user, domain, logonid, computer)
         p.begin = self._record.timestamp()
         return p
-    
+
     def get_process_from_5_event(self):
         path = self.get_xpath("/Event/EventData/Data[@Name='Image']").text
         pid = int(self.get_xpath("/Event/EventData/Data[@Name='ProcessId']").text, 0x10)
