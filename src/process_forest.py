@@ -29,7 +29,8 @@ def to_lxml(record_xml):
 class Process(object):
     NOTE_FAKE_PARENT = "Fake Parent: This is a faked process created since a ppid didn't exist"
     NOTE_END_LOST = "Lost End Timestamp: This end timestamp is suspect, because it collided with another process"
-    def __init__(self, pid, ppid, cmdline, ppname, hashes, path, user, domain, logonid, computer):
+    def __init__(self, pid, ppid, cmdline, ppname, hashes, path, user, domain, logonid, computer,
+            pid_formatter=str):
         super(Process, self).__init__()
         self.pid = pid
         self.ppid = ppid
@@ -47,22 +48,20 @@ class Process(object):
         self.children = []
         self.notes = None
         self.id = None  # set by analyzer, unique with analyzer session
+        self.pid_formatter = pid_formatter
 
     def __str__(self):
-        if args.hexpids:
-            return "%s, cmd=%s, hashes=%s, pid=%x, ppid=%x, begin=%s, end=%s" % (
-                    self.path, self.cmdline, self.hashes, self.pid, self.ppid,
-                    self.begin.isoformat(), self.end.isoformat())
-        else:
-            return "%s, cmd=%s, hashes=%s, pid=%d, ppid=%d, begin=%s, end=%s" % (
-                    self.path, self.cmdline, self.hashes, self.pid, self.ppid,
-                    self.begin.isoformat(), self.end.isoformat())
+        return "%s, cmd=%s, hashes=%s, pid=%s, ppid=%s, begin=%s, end=%s" % (
+                self.path, self.cmdline, self.hashes,
+                self.pid_formatter(self.pid), self.pid_formatter(self.ppid),
+                self.begin.isoformat(), self.end.isoformat())
 
     # TODO: move serialize, deserialize here
 
 
-def create_fake_parent_process(pid, name):
-    p = Process(pid, 0, "UNKNOWN", "UNKNOWN", "UNKNOWN", name, "UNKNOWN", "UNKNOWN", "UNKNOWN", "UNKNOWN")
+def create_fake_parent_process(pid, name, pid_formatter=str):
+    p = Process(pid, 0, "UNKNOWN", "UNKNOWN", "UNKNOWN", name, "UNKNOWN", "UNKNOWN", "UNKNOWN", "UNKNOWN",
+            pid_formatter=pid_formatter)
     p.notes = Process.NOTE_FAKE_PARENT
     return p
 
@@ -72,12 +71,13 @@ class NotAProcessEventError(Exception):
 
 
 class Entry(object):
-    def __init__(self, xml, record):
+    def __init__(self, xml, record, pid_formatter=str):
         super(Entry, self).__init__()
         self._xml = xml
         self._record = record
         self._node = to_lxml(self._xml)
         self._logger = logging.getLogger("process-forest.Entry")
+        self.pid_formatter = pid_formatter
 
     def get_xpath(self, path):
         return self._node.xpath(path)[0]
@@ -117,7 +117,8 @@ class Entry(object):
         domain = self.get_xpath("/Event/EventData/Data[@Name='SubjectDomainName']").text
         logonid = self.get_xpath("/Event/EventData/Data[@Name='SubjectLogonId']").text
         computer = self.get_xpath("/Event/System/Computer").text
-        p = Process(pid, ppid, cmdline, ppname, hashes, path, user, domain, logonid, computer)
+        p = Process(pid, ppid, cmdline, ppname, hashes, path, user, domain, logonid, computer,
+                pid_formatter=self.pid_formatter)
         p.begin = self._record.timestamp()
         return p
 
@@ -132,7 +133,8 @@ class Entry(object):
         domain = self.get_xpath("/Event/EventData/Data[@Name='SubjectDomainName']").text
         logonid = self.get_xpath("/Event/EventData/Data[@Name='SubjectLogonId']").text
         computer = self.get_xpath("/Event/System/Computer").text
-        p = Process(pid, ppid, cmdline, ppname, hashes, path, user, domain, logonid, computer)
+        p = Process(pid, ppid, cmdline, ppname, hashes, path, user, domain, logonid, computer,
+                pid_formatter=self.pid_formatter)
         p.end = self._record.timestamp()
         return p
 
@@ -148,7 +150,8 @@ class Entry(object):
         domain = ud[0]
         logonid = self.get_xpath("/Event/EventData/Data[@Name='LogonId']").text
         computer = self.get_xpath("/Event/System/Computer").text
-        p = Process(pid, ppid, cmdline, ppname, hashes, path, user, domain, logonid, computer)
+        p = Process(pid, ppid, cmdline, ppname, hashes, path, user, domain, logonid, computer,
+                pid_formatter=self.pid_formatter)
         p.begin = self._record.timestamp()
         return p
 
@@ -163,7 +166,8 @@ class Entry(object):
         domain = "UNKNOWN"
         logonid = "UNKNOWN"
         computer = self.get_xpath("/Event/System/Computer").text
-        p = Process(pid, ppid, cmdline, ppname, hashes, path, user, domain, logonid, computer)
+        p = Process(pid, ppid, cmdline, ppname, hashes, path, user, domain, logonid, computer,
+                pid_formatter=self.pid_formatter)
         p.end = self._record.timestamp()
         return p
 
@@ -202,11 +206,12 @@ def get_entries_with_eids(evtx, eids):
 
 
 class ProcessTreeAnalyzer(object):
-    def __init__(self):
+    def __init__(self, pid_formatter=str):
         super(ProcessTreeAnalyzer, self).__init__()
         self._defs = {}
         self._roots = []
         self._logger = logging.getLogger("process-forest.analyzer")
+        self.pid_formatter = pid_formatter
 
     def analyze(self, entries):
         """
@@ -218,10 +223,7 @@ class ProcessTreeAnalyzer(object):
             if entry.is_process_created_event() or entry.is_sysmon_proc_created_event():
                 process = entry.get_process_from_event()
                 if process.pid in open_processes:
-                    if args.hexpids:
-                        self._logger.warning("collision on pid: %x", process.pid)
-                    else:
-                        self._logger.warning("collision on pid: %d", process.pid)
+                    self._logger.warning("collision on pid: %s", self.pid_formatter(process.pid))
                     other = open_processes[process.pid]
                     other.notes = Process.NOTE_END_LOST
                     other.end = entry.get_timestamp()
@@ -232,12 +234,11 @@ class ProcessTreeAnalyzer(object):
                     process.parent = open_processes[process.ppid]
                     process.parent.children.append(process)
                 else:
-                    if args.hexpids:
-                        self._logger.warning("parent process %x not captured for new process %x", process.ppid, process.pid)
-                    else:
-                        self._logger.warning("parent process %d not captured for new process %d", process.ppid, process.pid)
+                    self._logger.warning("parent process %x not captured for new process %s",
+                            self.pid_formatter(process.ppid), self.pid_formatter(process.pid))
                     # open a faked parent
-                    process.parent = create_fake_parent_process(process.ppid, process.ppname)
+                    process.parent = create_fake_parent_process(process.ppid, process.ppname,
+                            pid_formatter=self.pid_formatter)
                     process.parent.children.append(process)
                     open_processes[process.ppid] = process.parent
 
@@ -256,10 +257,7 @@ class ProcessTreeAnalyzer(object):
                     del(open_processes[process.pid])
                     closed_processes.append(process)
                 else:
-                    if args.hexpids:
-                        self._logger.warning("missing start event for exiting process: %x", process.pid)
-                    else:
-                        self._logger.warning("missing start event for exiting process: %d", process.pid)
+                    self._logger.warning("missing start event for exiting process: %s", self.pid_formatter(process.pid))
                     # won't be able to guess parent, since it's PID may have been recycled
                     closed_processes.append(process)
             else:
@@ -345,7 +343,8 @@ class ProcessTreeAnalyzer(object):
         data = json.loads(s)
 
         def complexify_process(p):
-            process = Process(p["pid"], p["ppid"], p["cmdline"], p["ppname"], p["hashes"], p["path"], p["user"], p["domain"], p["logonid"], p["computer"])
+            process = Process(p["pid"], p["ppid"], p["cmdline"], p["ppname"], p["hashes"], p["path"], p["user"], p["domain"], p["logonid"], p["computer"],
+                    pid_formatter=self.pid_formatter)
             process.begin = iso8601.parse_date(p["begin"]).replace(tzinfo=None)
             process.end = iso8601.parse_date(p["end"]).replace(tzinfo=None)
             process.parent = p["parent"]
@@ -465,10 +464,14 @@ def main():
     serialize_parser.add_argument("pt", type=str, default="state.pt",
                         help=".pt file to serialize parsed trees")
 
-    global args
     args = parser.parse_args()
 
-    analyzer = ProcessTreeAnalyzer()
+    if args.hexpids:
+        pid_formatter = hex
+    else:
+        pid_formatter = str
+
+    analyzer = ProcessTreeAnalyzer(pid_formatter=pid_formatter)
     if args.input_file.lower().endswith(".pt"):
         g_logger.info("using serialized file")
         with open(args.input_file, "rb") as f:
