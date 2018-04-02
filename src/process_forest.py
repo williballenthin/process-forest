@@ -49,9 +49,14 @@ class Process(object):
         self.id = None  # set by analyzer, unique with analyzer session
 
     def __str__(self):
-        return "Process(%s, cmd=%s, hashes=%s, pid=%x, ppid=%x, begin=%s, end=%s" % (
-                self.path, self.cmdline, self.hashes, self.pid, self.ppid,
-                self.begin.isoformat(), self.end.isoformat())
+        if args.hexpids:
+            return "%s, cmd=%s, hashes=%s, pid=%x, ppid=%x, begin=%s, end=%s" % (
+                    self.path, self.cmdline, self.hashes, self.pid, self.ppid,
+                    self.begin.isoformat(), self.end.isoformat())
+        else:
+            return "%s, cmd=%s, hashes=%s, pid=%d, ppid=%d, begin=%s, end=%s" % (
+                    self.path, self.cmdline, self.hashes, self.pid, self.ppid,
+                    self.begin.isoformat(), self.end.isoformat())
 
     # TODO: move serialize, deserialize here
 
@@ -213,7 +218,10 @@ class ProcessTreeAnalyzer(object):
             if entry.is_process_created_event() or entry.is_sysmon_proc_created_event():
                 process = entry.get_process_from_event()
                 if process.pid in open_processes:
-                    self._logger.warning("collision on pid: %x", process.pid)
+                    if args.hexpids:
+                        self._logger.warning("collision on pid: %x", process.pid)
+                    else:
+                        self._logger.warning("collision on pid: %d", process.pid)
                     other = open_processes[process.pid]
                     other.notes = Process.NOTE_END_LOST
                     other.end = entry.get_timestamp()
@@ -224,7 +232,10 @@ class ProcessTreeAnalyzer(object):
                     process.parent = open_processes[process.ppid]
                     process.parent.children.append(process)
                 else:
-                    self._logger.warning("parent process %x not captured for new process %x", process.ppid, process.pid)
+                    if args.hexpids:
+                        self._logger.warning("parent process %x not captured for new process %x", process.ppid, process.pid)
+                    else:
+                        self._logger.warning("parent process %d not captured for new process %d", process.ppid, process.pid)
                     # open a faked parent
                     process.parent = create_fake_parent_process(process.ppid, process.ppname)
                     process.parent.children.append(process)
@@ -245,7 +256,10 @@ class ProcessTreeAnalyzer(object):
                     del(open_processes[process.pid])
                     closed_processes.append(process)
                 else:
-                    self._logger.warning("missing start event for exiting process: %x", process.pid)
+                    if args.hexpids:
+                        self._logger.warning("missing start event for exiting process: %x", process.pid)
+                    else:
+                        self._logger.warning("missing start event for exiting process: %d", process.pid)
                     # won't be able to guess parent, since it's PID may have been recycled
                     closed_processes.append(process)
             else:
@@ -436,6 +450,8 @@ def main():
                     "that match the given EID.")
     parser.add_argument("input_file", type=str,
                         help="Path to the Windows EVTX file or .pt file")
+    parser.add_argument("-X", "--hexpids",
+        action="store_true", dest="hexpids", default=False, help="Output PID values in hexidecimal.")
 
     subparsers = parser.add_subparsers(dest="cmd")
 
@@ -449,6 +465,7 @@ def main():
     serialize_parser.add_argument("pt", type=str, default="state.pt",
                         help=".pt file to serialize parsed trees")
 
+    global args
     args = parser.parse_args()
 
     analyzer = ProcessTreeAnalyzer()
