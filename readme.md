@@ -48,18 +48,18 @@ Display process trees for all process lifetime events:
 
     > python process_forest.py SECURITY.evtx ts all
 
-    Process(C:\Windows\explorer.exe, cmd=UNKNOWN, hashes=UNKNOWN, pid=ce8, ppid=0, begin=0001-01-01T00:00:00, end=0001-01-01T00:00:00: Fake Parent: This is a faked process created since a ppid didn't exist
-      Process(C:\Windows\System32\cmd.exe, cmd="C:\Windows\system32\cmd.exe" , hashes=UNKNOWN, pid=968, ppid=ce8, begin=2016-03-19T20:47:43.846725, end=0001-01-01T00:00:00
-        Process(C:\Windows\System32\conhost.exe, cmd=\??\C:\Windows\system32\conhost.exe 0xffffffff -ForceV1, hashes=UNKNOWN, pid=10b0, ppid=968, begin=2016-03-19T20:47:43.930553, end=0001-01-01T00:00:00
-        Process(C:\Windows\System32\PING.EXE, cmd=ping  192.168.2.2, hashes=UNKNOWN, pid=13f8, ppid=968, begin=2016-03-19T20:47:48.418451, end=2016-03-19T20:47:51.509247
-        Process(C:\Windows\System32\net.exe, cmd=net  time, hashes=UNKNOWN, pid=b78, ppid=968, begin=2016-03-19T20:47:53.295649, end=2016-03-19T20:48:00.207243
-          Process(C:\Windows\System32\net1.exe, cmd=C:\Windows\system32\net1  time, hashes=UNKNOWN, pid=f0c, ppid=b78, begin=2016-03-19T20:47:53.306993, end=2016-03-19T20:48:01.142002
-        Process(C:\Windows\System32\calc.exe, cmd=calc, hashes=UNKNOWN, pid=920, ppid=968, begin=2016-03-19T20:48:29.693279, end=2016-03-19T20:48:32.034391
-        Process(C:\Windows\System32\notepad.exe, cmd=notepad, hashes=UNKNOWN, pid=d14, ppid=968, begin=2016-03-19T20:48:35.440413, end=0001-01-01T00:00:00
-    Process(C:\Windows\System32\svchost.exe, cmd=UNKNOWN, hashes=UNKNOWN, pid=338, ppid=0, begin=0001-01-01T00:00:00, end=0001-01-01T00:00:00: Fake Parent: This is a faked process created since a ppid didn't exist
-      Process(C:\Windows\System32\dllhost.exe, cmd=C:\Windows\system32\DllHost.exe /Processid:{AB8902B4-09CA-4BB6-B78D-A8F59079A8D5}, hashes=UNKNOWN, pid=1020, ppid=338, begin=2016-03-19T20:47:43.038507, end=2016-03-19T20:47:48.193815
-      Process(C:\Windows\System32\ApplicationFrameHost.exe, cmd=C:\Windows\system32\ApplicationFrameHost.exe -Embedding, hashes=UNKNOWN, pid=678, ppid=338, begin=2016-03-19T20:48:30.616486, end=0001-01-01T00:00:00
-      Process(C:\Program Files\WindowsApps\Microsoft.WindowsCalculator_10.1601.49020.0_x64__8wekyb3d8bbwe\Calculator.exe, cmd="C:\Program Files\WindowsApps\Microsoft.WindowsCalculator_10.1601.49020.0_x64__8wekyb3d8bbwe\Calculator.exe" -ServerName:App.AppXsm3pg4n7er43kdh1qp4e79f1j7am68r8.mca, hashes=UNKNOWN, pid=3c0, ppid=338, begin=2016-03-19T20:48:31.711050, end=0001-01-01T00:00:00
+    Process(C:\Windows\explorer.exe, cmd=UNKNOWN, hashes=UNKNOWN, pid=3304, ppid=0, begin=0001-01-01T00:00:00, end=0001-01-01T00:00:00: Fake Parent: This is a faked process created since a ppid didn't exist
+      Process(C:\Windows\System32\cmd.exe, cmd="C:\Windows\system32\cmd.exe" , hashes=UNKNOWN, pid=2408, ppid=3304, begin=2016-03-19T20:47:43.846725, end=0001-01-01T00:00:00
+        Process(C:\Windows\System32\conhost.exe, cmd=\??\C:\Windows\system32\conhost.exe 0xffffffff -ForceV1, hashes=UNKNOWN, pid=4272, ppid=2408, begin=2016-03-19T20:47:43.930553, end=0001-01-01T00:00:00
+        Process(C:\Windows\System32\PING.EXE, cmd=ping  192.168.2.2, hashes=UNKNOWN, pid=5112, ppid=2408, begin=2016-03-19T20:47:48.418451, end=2016-03-19T20:47:51.509247
+        Process(C:\Windows\System32\net.exe, cmd=net  time, hashes=UNKNOWN, pid=2936, ppid=2408, begin=2016-03-19T20:47:53.295649, end=2016-03-19T20:48:00.207243
+          Process(C:\Windows\System32\net1.exe, cmd=C:\Windows\system32\net1  time, hashes=UNKNOWN, pid=3852, ppid=2936, begin=2016-03-19T20:47:53.306993, end=2016-03-19T20:48:01.142002
+        Process(C:\Windows\System32\calc.exe, cmd=calc, hashes=UNKNOWN, pid=2336, ppid=2408, begin=2016-03-19T20:48:29.693279, end=2016-03-19T20:48:32.034391
+        Process(C:\Windows\System32\notepad.exe, cmd=notepad, hashes=UNKNOWN, pid=3348, ppid=2408, begin=2016-03-19T20:48:35.440413, end=0001-01-01T00:00:00
+    Process(C:\Windows\System32\svchost.exe, cmd=UNKNOWN, hashes=UNKNOWN, pid=2084, ppid=0, begin=0001-01-01T00:00:00, end=0001-01-01T00:00:00: Fake Parent: This is a faked process created since a ppid didn't exist
+      Process(C:\Windows\System32\dllhost.exe, cmd=C:\Windows\system32\DllHost.exe /Processid:{AB8902B4-09CA-4BB6-B78D-A8F59079A8D5}, hashes=UNKNOWN, pid=4128, ppid=2084, begin=2016-03-19T20:47:43.038507, end=2016-03-19T20:47:48.193815
+      Process(C:\Windows\System32\ApplicationFrameHost.exe, cmd=C:\Windows\system32\ApplicationFrameHost.exe -Embedding, hashes=UNKNOWN, pid=1656, ppid=2084, begin=2016-03-19T20:48:30.616486, end=0001-01-01T00:00:00
+      Process(C:\Program Files\WindowsApps\Microsoft.WindowsCalculator_10.1601.49020.0_x64__8wekyb3d8bbwe\Calculator.exe, cmd="C:\Program Files\WindowsApps\Microsoft.WindowsCalculator_10.1601.49020.0_x64__8wekyb3d8bbwe\Calculator.exe" -ServerName:App.AppXsm3pg4n7er43kdh1qp4e79f1j7am68r8.mca, hashes=UNKNOWN, pid=960, ppid=2084, begin=2016-03-19T20:48:31.711050, end=0001-01-01T00:00:00
         ...
 
     > python process_forest.py Microsoft-Windows-Sysmon%4Operational.evtx ts all
@@ -99,6 +99,25 @@ Display process trees for all process lifetime events:
         Process(C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe, cmd=powershell.exe  Invoke-Command -ScriptBlock {Get-Help Invoke-Command -full}, hashes=MD5=852D67A27E454BD389FA7F02A8CBE23F,IMPHASH=F2C0E8A5BD10DBC167455484050CD683, pid=2980, ppid=1100, begin=2016-03-23T17:13:53.551691, end=2016-03-23T17:13:54.940161
       Process(C:\Program Files\Windows Media Player\wmpnscfg.exe, cmd="C:\Program Files\Windows Media Player\wmpnscfg.exe", hashes=MD5=6699A112A3BDC9B52338512894EBA9D6,IMPHASH=CE1A36A2A999517CA9B1C36DF3B7E240, pid=764, ppid=1448, begin=2016-03-23T21:03:26.993387, end=2016-03-23T21:03:27.040190
     ...
+
+To display PID and PPID values in hexidecimal, use the `-X` (`--hexpids`) option:
+
+
+    > python process_forest.py --hexpids SECURITY.evtx ts all
+
+    Process(C:\Windows\explorer.exe, cmd=UNKNOWN, hashes=UNKNOWN, pid=0xce8, ppid=0x0, begin=0001-01-01T00:00:00, end=0001-01-01T00:00:00: Fake Parent: This is a faked process created since a ppid didn't exist
+      Process(C:\Windows\System32\cmd.exe, cmd="C:\Windows\system32\cmd.exe" , hashes=UNKNOWN, pid=0x968, ppid=0xce8, begin=2016-03-19T20:47:43.846725, end=0001-01-01T00:00:00
+        Process(C:\Windows\System32\conhost.exe, cmd=\??\C:\Windows\system32\conhost.exe 0xffffffff -ForceV1, hashes=UNKNOWN, pid=0x10b0, ppid=0x968, begin=2016-03-19T20:47:43.930553, end=0001-01-01T00:00:00
+        Process(C:\Windows\System32\PING.EXE, cmd=ping  192.168.2.2, hashes=UNKNOWN, pid=0x13f8, ppid=0x968, begin=2016-03-19T20:47:48.418451, end=2016-03-19T20:47:51.509247
+        Process(C:\Windows\System32\net.exe, cmd=net  time, hashes=UNKNOWN, pid=0xb78, ppid=0x968, begin=2016-03-19T20:47:53.295649, end=2016-03-19T20:48:00.207243
+          Process(C:\Windows\System32\net1.exe, cmd=C:\Windows\system32\net1  time, hashes=UNKNOWN, pid=0xf0c, ppid=0xb78, begin=2016-03-19T20:47:53.306993, end=2016-03-19T20:48:01.142002
+        Process(C:\Windows\System32\calc.exe, cmd=calc, hashes=UNKNOWN, pid=0x920, ppid=0x968, begin=2016-03-19T20:48:29.693279, end=2016-03-19T20:48:32.034391
+        Process(C:\Windows\System32\notepad.exe, cmd=notepad, hashes=UNKNOWN, pid=0xd14, ppid=0x968, begin=2016-03-19T20:48:35.440413, end=0001-01-01T00:00:00
+    Process(C:\Windows\System32\svchost.exe, cmd=UNKNOWN, hashes=UNKNOWN, pid=0x338, ppid=0x0, begin=0001-01-01T00:00:00, end=0001-01-01T00:00:00: Fake Parent: This is a faked process created since a ppid didn't exist
+      Process(C:\Windows\System32\dllhost.exe, cmd=C:\Windows\system32\DllHost.exe /Processid:{AB8902B4-09CA-4BB6-B78D-A8F59079A8D5}, hashes=UNKNOWN, pid=0x1020, ppid=0x338, begin=2016-03-19T20:47:43.038507, end=2016-03-19T20:47:48.193815
+      Process(C:\Windows\System32\ApplicationFrameHost.exe, cmd=C:\Windows\system32\ApplicationFrameHost.exe -Embedding, hashes=UNKNOWN, pid=0x678, ppid=0x338, begin=2016-03-19T20:48:30.616486, end=0001-01-01T00:00:00
+      Process(C:\Program Files\WindowsApps\Microsoft.WindowsCalculator_10.1601.49020.0_x64__8wekyb3d8bbwe\Calculator.exe, cmd="C:\Program Files\WindowsApps\Microsoft.WindowsCalculator_10.1601.49020.0_x64__8wekyb3d8bbwe\Calculator.exe" -ServerName:App.AppXsm3pg4n7er43kdh1qp4e79f1j7am68r8.mca, hashes=UNKNOWN, pid=0x3c0, ppid=0x338, begin=2016-03-19T20:48:31.711050, end=0001-01-01T00:00:00
+        ...
 
 For large EVTX files, the parsing can take a while (due to the implementation in Python).
 To save time as you explore the tool, you can preprocess the log file into
