@@ -494,7 +494,7 @@ def main():
         if not args.pt.lower().endswith(".pt"):
             g_logger.error("serialize output file must have .pt extension")
         else:
-            with open(args.pt, "wb") as f:
+            with open(args.pt, "w") as f:
                 analyzer.serialize(f)
     else:
         g_logger.error("unknown command: %s", args.cmd)
