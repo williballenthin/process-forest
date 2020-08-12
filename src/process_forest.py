@@ -336,7 +336,7 @@ class ProcessTreeAnalyzer(object):
                 "roots": self._roots,
         }
         s = json.dumps(data)
-        f.write(s)
+        f.write(s.encode('utf-8'))
 
     def deserialize(self, f):
         s = f.read()
